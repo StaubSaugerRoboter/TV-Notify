@@ -1,16 +1,21 @@
-// use std::fs;
-
-use env_logger;
-use log::{error, info, trace, warn};
+use log::{error, info, set_max_level, LevelFilter};
 use std::cmp::max;
 use std::{thread, time};
 
 fn main() {
-	env_logger::init();
+	if systemd_journal_logger::connected_to_journal() {
+		systemd_journal_logger::init_with_extra_fields(vec![(
+			"VERSION",
+			env!("CARGO_PKG_VERSION"),
+		)])
+			.unwrap();
+	} else {
+		env_logger::init();
+	}
+	set_max_level(LevelFilter::Info);
 
 	let topic = "tv/display/state";
 	let host = "tcp://10.0.102.65:1883";
-	// let file_content = fs::read_to_string("on").unwrap();
 
 	let mut wait_secs = 2;
 	let mut last_state = "start";
@@ -18,10 +23,6 @@ fn main() {
 
 	loop {
 		thread::sleep(time::Duration::from_secs(wait_secs));
-		// let modetest = get_modetest().unwrap_or_else(|e| {
-		// println!("Error getting modeset: {:?}: ", e);
-		// continue;
-		// });
 		let modetest = match get_modetest() {
 			Ok(val) => val,
 			Err(e) => {
@@ -32,11 +33,7 @@ fn main() {
 			}
 		};
 
-		// println!("{}", modetest);
-
-
 		let dpms = get_dpms(&modetest);
-		trace!("DPMS: {:?}", dpms);
 		if let Some(state) = dpms {
 			let payload = if state { "on" } else { "off" };
 			if payload != last_state {
@@ -62,7 +59,6 @@ fn main() {
 		} else {
 			error!("Could not get display status from modetest!");
 			info!("Dpms: {:?}", dpms);
-			// info!("Modetest: {}", modetest);
 			wait_secs = std::cmp::min(wait_secs * 2, 180);
 			error!("Setting wait to: {}", wait_secs);
 		}
@@ -77,7 +73,6 @@ lazy_static! {
 }
 
 fn get_dpms(modetest: &str) -> Option<bool> {
-	// let RE = Regex::new(r"(?msU)HDMI-A-1.*DPMS.*value: (\d)").unwrap();
 	let re_result = RE.captures(modetest);
 	if let Some(captures) = re_result {
 		if captures.get(1).unwrap().as_str() == "0" {
@@ -94,8 +89,7 @@ use std::process::Command;
 use std::string::FromUtf8Error;
 
 fn get_modetest() -> Result<String, FromUtf8Error> {
-	let output = Command::new("modetest")
-		.output();
+	let output = Command::new("modetest").output();
 
 	if let Err(e) = &output {
 		error!("Error getting modetest: {:?}", e);

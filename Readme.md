@@ -6,7 +6,14 @@ state of the display output on a Raspberry Pi you need to parse `modetest`.
 This application does so and sends the state to an MQTT broker during startup
 or during changes.
 
+## Configure
+You will need to edit the `host` and `topic` variable so that it
+matches your broker. 
+
 ## Compile
+You will need [cross](https://github.com/cross-rs/cross). And the
+nightly toolchain for musl, as glibc will fail to run on
+Libreelec due to linking issues.
 
 ```bash
 export RUSTFLAGS="-C link-arg=-lgcc -Clink-arg=-static-libgcc"
@@ -22,6 +29,7 @@ Description=TV Display to MQTT
 After=network.target
 
 [Service]
+LogLevelMax=6
 ExecStart=/storage/.bin/tv-notify
 TimeoutStopSec=2
 Restart=always
