@@ -7,8 +7,10 @@ edition = "2021"
 
 [dependencies]
 regex = "1"
-lazy_static = "1"
 paho-mqtt = {version = "0.11", default-features = false, features = ["bundled"]}
 log = "0.4"
 env_logger = "0.9.3"
 systemd-journal-logger = "0.5.1"
+confy = "0.5.1"
+serde = "1.0.147"
+serde_derive = "1.0.147"

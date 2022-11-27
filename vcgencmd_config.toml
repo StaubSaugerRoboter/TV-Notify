@@ -1,0 +1,7 @@
+topic = 'tv/display_testing/state'
+host = 'tcp://10.0.102.65:18830'
+max_timeout = 30
+command = '/opt/vc/bin/vcgencmd'
+args = ['display_power']
+regex = '(?msU)display_power=(\d)'
+true_strings = ['1']

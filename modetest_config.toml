@@ -1,0 +1,7 @@
+topic = 'tv/display_testing/state'
+host = 'tcp://10.0.102.65:18830'
+max_timeout = 30
+command = 'modetest'
+args = []
+regex = '(?msU)HDMI-A-1.*DPMS.*value: (\d)'
+true_strings = ['0']

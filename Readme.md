@@ -1,14 +1,16 @@
-# Display Power State to MQTT
+# Command Output to MQTT
 
 The new Libreelec image does not support `vcgencmd display_power`
 anymore. Therefore, if you want to notify Home Assistant about the
 state of the display output on a Raspberry Pi you need to parse `modetest`.
 This application does so and sends the state to an MQTT broker during startup
-or during changes.
+or during changes. You can configure the behaviour through the config and also adapt
+it to other commands such as `vcgencmd display_power`.
+
 
 ## Configure
-You will need to edit the `host` and `topic` variable so that it
-matches your broker. 
+Copy either `modetest_config.toml` or `vcgencmd_config.toml` to `/etc/tv-notify/config.toml`
+change the content to match you setup (MQTT broker, topic..).
 
 ## Compile
 You will need [cross](https://github.com/cross-rs/cross). And the
